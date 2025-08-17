@@ -1,4 +1,5 @@
 # Octagon Deep Research MCP
+[![Trust Score](https://archestra.ai/mcp-catalog/api/badge/quality/OctagonAI/octagon-deep-research-mcp)](https://archestra.ai/mcp-catalog/octagonai__octagon-deep-research-mcp)
 
 ![Favicon](https://docs.octagonagents.com/logo.svg) The Octagon Deep Research MCP server provides specialized AI-powered comprehensive research and analysis capabilities by integrating with advanced deep research agents. No rate limits, faster than ChatGPT Deep Research, more thorough than Grok DeepSearch or Perplexity Deep Research. Add unlimited deep research functionality to any MCP client including Claude Desktop, Cursor, and other popular MCP-enabled applications.
 
