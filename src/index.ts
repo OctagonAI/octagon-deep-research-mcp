@@ -1,7 +1,9 @@
 #!/usr/bin/env node
 
+import type { RequestHandlerExtra } from "@modelcontextprotocol/sdk/shared/protocol.js";
 import { McpServer } from "@modelcontextprotocol/sdk/server/mcp.js";
 import { StdioServerTransport } from "@modelcontextprotocol/sdk/server/stdio.js";
+import type { ServerNotification, ServerRequest } from "@modelcontextprotocol/sdk/types.js";
 import dotenv from "dotenv";
 import { readFile } from "fs/promises";
 import OpenAI from "openai";
@@ -122,7 +124,7 @@ server.tool(
   {
     prompt: z.string().describe("Your natural language query or request for the agent"),
   },
-  async ({ prompt }: PromptParams, extra) => {
+  async ({ prompt }: PromptParams, extra: RequestHandlerExtra<ServerRequest, ServerNotification>) => {
     const sendLog = (message: string) =>
       extra.sendNotification({
         method: "notifications/message",
