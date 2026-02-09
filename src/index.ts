@@ -75,6 +75,37 @@ async function processStreamingResponse(stream: any): Promise<string> {
   }
 }
 
+// Heartbeat helper for long-running tool calls (keeps transport alive, reduces client timeouts)
+interface HeartbeatContext {
+  sendLog: (message: string) => Promise<void>;
+  sendProgress?: (progress: number, message: string) => Promise<void>;
+}
+
+const SPINNER_FRAMES = ["|", "/", "-", "\\"];
+
+function startHeartbeat(ctx: HeartbeatContext): () => void {
+  const startTime = Date.now();
+  let tick = 0;
+
+  const intervalId = setInterval(async () => {
+    const elapsed = Math.floor((Date.now() - startTime) / 1000);
+    const frame = SPINNER_FRAMES[tick % SPINNER_FRAMES.length];
+    const message = `${frame} Processing... (${elapsed}s)`;
+    tick++;
+
+    try {
+      await ctx.sendLog(message);
+      if (ctx.sendProgress) {
+        await ctx.sendProgress(tick, message);
+      }
+    } catch {
+      // Swallow errors -- heartbeat is best-effort
+    }
+  }, 1_000);
+
+  return () => clearInterval(intervalId);
+}
+
 // Define a schema for the 'prompt' parameter that all tools will use
 const promptSchema = z.object({
   prompt: z.string().describe("Your natural language query or request for the agent"),
@@ -91,7 +122,23 @@ server.tool(
   {
     prompt: z.string().describe("Your natural language query or request for the agent"),
   },
-  async ({ prompt }: PromptParams) => {
+  async ({ prompt }: PromptParams, extra) => {
+    const sendLog = (message: string) =>
+      extra.sendNotification({
+        method: "notifications/message",
+        params: { level: "info", data: message },
+      });
+
+    const progressToken = extra._meta?.progressToken;
+    const sendProgress = progressToken
+      ? (progress: number, message: string) =>
+          extra.sendNotification({
+            method: "notifications/progress",
+            params: { progressToken, progress, total: 0, message },
+          })
+      : undefined;
+
+    const stopHeartbeat = startHeartbeat({ sendLog, sendProgress });
     try {
       const response = await octagonClient.chat.completions.create({
         model: "octagon-deep-research-agent",
@@ -120,6 +167,8 @@ server.tool(
           },
         ],
       };
+    } finally {
+      stopHeartbeat();
     }
   }
 );
