@@ -133,11 +133,21 @@ server.tool(
 
     const progressToken = extra._meta?.progressToken;
     const sendProgress = progressToken
-      ? (progress: number, message: string) =>
-          extra.sendNotification({
+      ? (progress: number, message: string) => {
+          const params: { progressToken: typeof progressToken; progress: number; message: string; total?: number } = {
+            progressToken,
+            progress,
+            message,
+          };
+          const total = extra._meta && "total" in extra._meta ? Number((extra._meta as { total?: number }).total) : undefined;
+          if (total !== undefined && total > 0) {
+            params.total = total;
+          }
+          return extra.sendNotification({
             method: "notifications/progress",
-            params: { progressToken, progress, total: 0, message },
-          })
+            params,
+          });
+        }
       : undefined;
 
     const stopHeartbeat = startHeartbeat({ sendLog, sendProgress });
