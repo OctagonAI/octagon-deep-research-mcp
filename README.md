@@ -6,6 +6,10 @@
 
 [![Demo](https://img.youtube.com/vi/yh1cyrm9aus/0.jpg)](https://youtu.be/yh1cyrm9aus)
 
+<a href="https://glama.ai/mcp/servers/@OctagonAI/octagon-deep-research-mcp">
+  <img width="380" height="200" src="https://glama.ai/mcp/servers/@OctagonAI/octagon-deep-research-mcp/badge" alt="Octagon Deep Research MCP server" />
+</a>
+
 ## 🏆 Why Teams Choose Octagon's Enterprise-Grade Deep Research API
 
 👉 **8–10x faster** than the leading incumbent—complex analyses complete in seconds, not minutes  
